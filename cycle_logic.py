@@ -1,6 +1,12 @@
-from tabulate import tabulate
+"""
+Build a list of users and calculte the average cycle times
+"""
+
+
 import collections
 import datetime
+
+from tabulate import tabulate
 
 
 StoryRow = collections.namedtuple(
@@ -8,22 +14,26 @@ StoryRow = collections.namedtuple(
 
 
 class CycleLogic():
+    """Build a list of users and calculte the average cycle times"""
     def __init__(self):
         self._stories = []
         self._members = {}
 
 
     def add_story(self, story):
+        """Add a story"""
         self._stories.append(story)
 
 
     def add_member(self, member):
+        """Add a member"""
         self._members[member['id']] = member
 
 
     def tabulate_result(self, weeks_count=8):
-        w, h = weeks_count+1, len(self.members)
-        table = [[0 for x in range(w)] for y in range(h)]
+        """Preprare results in a table that can be displayed in console"""
+        width, haight = weeks_count+1, len(self.members)
+        table = [[0 for x in range(width)] for y in range(haight)]
         weeks = []
         headers = ['Member']
 
@@ -32,10 +42,10 @@ class CycleLogic():
 
         now = datetime.datetime.now()
         for i in range(weeks_count):
-            weekLabel = '%s W%s' % (now.isocalendar()[0], now.isocalendar()[1])
-            weeks.insert(0, weekLabel)
-            for y, member in enumerate(self.members):
-                table[y][weeks_count-i] = self._average_cycle_hours(
+            week_label = '%s W%s' % (now.isocalendar()[0], now.isocalendar()[1])
+            weeks.insert(0, week_label)
+            for j, member in enumerate(self.members):
+                table[j][weeks_count-i] = self._average_cycle_hours(
                     week=now, member=member)
             now -= datetime.timedelta(weeks=1)
 
@@ -44,6 +54,10 @@ class CycleLogic():
 
 
     def tabulate_stories(self):
+        """
+        Return an ascii table with the list of stories that can be displayed
+        in console.
+        """
         table = []
         for story in self._stories:
             if story.started:
@@ -64,14 +78,16 @@ class CycleLogic():
 
 
     def search_active_story_by_member(self, member):
+        """Active story per member"""
         result = []
         for story in self.stories:
-            if story.started and story.owner_id == member:
+            if story.started and not story.archived and story.owner_id == member:
                 result.append(story)
         return result
 
 
     def search_in_range(self, start_date, end_date, member):
+        """Active story per member in a date range"""
         result = []
         for story in self.search_active_story_by_member(member):
             if story.completed_at > start_date and story.started_at < end_date:
@@ -92,11 +108,11 @@ class CycleLogic():
                                           member=member):
             count += 1
             total += story.cycle_time_seconds
-        return int(total/count) if count>0 else 0
+        return int(total/count) if count > 0 else 0
 
 
-
-    def _week_range(self, date):
+    @classmethod
+    def _week_range(cls, date):
         start_date = datetime.datetime(date.year, date.month, date.day, 0, 0, 0)
         if date.isocalendar()[2] != 7:
             start_date -= datetime.timedelta(date.isocalendar()[2])
@@ -104,11 +120,18 @@ class CycleLogic():
         return start_date, end_date
 
 
+    def wild_experiment(self):
+        """Rethinking and double checking few things"""
+        pass
+
+
     @property
     def stories(self):
+        """All the stories"""
         return self._stories
 
 
     @property
     def members(self):
+        """All the members"""
         return self._members

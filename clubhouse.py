@@ -1,20 +1,28 @@
+"""
+All the ClubHouse api
+"""
+
+
 import json
 
 import requests
 
 
 class ClubHouseAPI():
+    """All the ClubHouse api"""
     def __init__(self, access_token):
         self.access_token = access_token
         self.base_url = 'https://api.clubhouse.io/api/beta'
 
 
-    def getEpics(self):
+    def get_epics(self):
+        """All the Epics"""
         return self._get('epics')
 
 
-    def getActiveEpics(self):
-        epics = self.getEpics()
+    def get_active_epics(self):
+        """All the active epics"""
+        epics = self.get_epics()
         result = []
         for epic in epics:
             if not epic['archived'] and not epic['completed'] and epic['started']:
@@ -22,12 +30,14 @@ class ClubHouseAPI():
         return result
 
 
-    def getMembers(self):
+    def get_members(self):
+        """All the members"""
         return self._get('members')
 
 
-    def getActiveMembers(self):
-        members = self.getMembers()
+    def get_active_members(self):
+        """All the active members"""
+        members = self.get_members()
         result = []
         for member in members:
             if not member['disabled']:
@@ -35,24 +45,26 @@ class ClubHouseAPI():
         return result
 
 
-    def searchStory(self, query, pages=5, nextQuery=None):
+    def search_story(self, query, pages=5, next_query=None):
+        """Search a story based on CH query syntax"""
         data = {'query': query}
 
-        if nextQuery is not None:
-            data['next'] = nextQuery.split('next=')[1]
+        if next_query is not None:
+            data['next'] = next_query.split('next=')[1]
 
-        r = self._get('search/stories', data=data)
-        results = r['data']
+        response = self._get('search/stories', data=data)
+        results = response['data']
 
-        if pages > 0 and 'next' in r.keys():
-            results += self.searchStory(query,
-                                        pages=pages-1,
-                                        nextQuery=r['next'])
+        if pages > 0 and 'next' in response.keys():
+            results += self.search_story(query,
+                                         pages=pages-1,
+                                         next_query=response['next'])
         return results
 
 
-    def storiesByMention(self, mention_name):
-        return self.searchStory('owner:%s' % mention_name)
+    def stories_by_mention(self, mention_name):
+        """All the active stories assigned to a member"""
+        return self.search_story('owner:%s' % mention_name)
 
 
     def _get(self, url, data=None):
@@ -63,5 +75,5 @@ class ClubHouseAPI():
         headers = {
             'content-type': 'application/json',
         }
-        r = requests.get(url, headers=headers, data=json.dumps(data))
-        return r.json()
+        response = requests.get(url, headers=headers, data=json.dumps(data))
+        return response.json()
