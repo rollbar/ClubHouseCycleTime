@@ -63,7 +63,7 @@ def main():
             cycle_logic.add_story(story)
 
     print('\n\n')
-    print(cycleLogic.tabulate_result())
+    print(cycle_logic.tabulate_result())
     # print(cycle_logic.wild_experiment())
 
 
