@@ -17,7 +17,7 @@ class CycleLogic():
     """Build a list of users and calculte the average cycle times"""
     def __init__(self):
         self._stories = []
-        self._members = {}
+        self._members = []
 
 
     def add_story(self, story):
@@ -27,7 +27,16 @@ class CycleLogic():
 
     def add_member(self, member):
         """Add a member"""
-        self._members[member['id']] = member
+        self._members.append(member)
+        self._members = sorted(self._members, key=lambda k: k['profile']['name'])
+
+
+    def member(self, member_id):
+        """Memeber details"""
+        for member in self.members:
+            if member['id'] == member_id:
+                return member
+        return None
 
 
     def tabulate_result(self, weeks_count=8):
@@ -38,9 +47,9 @@ class CycleLogic():
         headers = ['Member']
 
         for i, member in enumerate(self.members):
-            table[i][0] = self.members[member]['profile']['name']
+            table[i][0] = member['profile']['name']
 
-        now = datetime.datetime.now()
+        now = datetime.datetime.utcnow()
         for i in range(weeks_count):
             week_label = self._week_name(now)
             weeks.insert(0, week_label)
@@ -81,7 +90,7 @@ class CycleLogic():
         """Active story per member"""
         result = []
         for story in self.stories:
-            if story.started and not story.archived and story.owner_id == member:
+            if story.started and not story.archived and story.owner_id == member['id']:
                 result.append(story)
         return result
 
