@@ -7,6 +7,7 @@ name = "pypi"
 tabulate = "*"
 requests = "*"
 console-progressbar = "*"
+pytz = "*"
 
 [dev-packages]
 ipdb = "*"

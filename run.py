@@ -62,9 +62,9 @@ def main():
             story = Story(load_from_dict=ch_story, owner_id=member['id'])
             cycle_logic.add_story(story)
 
+
     print('\n\n')
     print(cycle_logic.tabulate_result())
-    # print(cycle_logic.wild_experiment())
 
 
 if __name__ == '__main__':

@@ -5,9 +5,9 @@ Build a list of users and calculte the average cycle times
 
 import collections
 import datetime
+import math
 
 from tabulate import tabulate
-
 
 StoryRow = collections.namedtuple(
     'StoryRow', 'story_id name owner started_at completed_at')
@@ -42,7 +42,7 @@ class CycleLogic():
 
         now = datetime.datetime.now()
         for i in range(weeks_count):
-            week_label = '%s W%s' % (now.isocalendar()[0], now.isocalendar()[1])
+            week_label = self._week_name(now)
             weeks.insert(0, week_label)
             for j, member in enumerate(self.members):
                 table[j][weeks_count-i] = self._average_cycle_hours(
@@ -96,7 +96,7 @@ class CycleLogic():
 
 
     def _average_cycle_hours(self, week, member):
-        return  int(self._average_cycle_seconds(week, member)/3600)
+        return  int(math.ceil(self._average_cycle_seconds(week, member)/3600))
 
 
     def _average_cycle_seconds(self, week, member):
@@ -120,9 +120,9 @@ class CycleLogic():
         return start_date, end_date
 
 
-    def wild_experiment(self):
-        """Rethinking and double checking few things"""
-        pass
+    @classmethod
+    def _week_name(cls, week):
+        return '%s W%s' % (week.isocalendar()[0], week.isocalendar()[1])
 
 
     @property

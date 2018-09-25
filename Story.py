@@ -80,7 +80,7 @@ class Story():
         if self._completed_at is not None:
             return self._completed_at
 
-        return datetime.datetime.now()
+        return datetime.datetime.utcnow()
 
 
     @completed_at.setter

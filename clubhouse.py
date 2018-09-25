@@ -54,8 +54,7 @@ class ClubHouseAPI():
 
         response = self._get('search/stories', data=data)
         results = response['data']
-
-        if pages > 0 and 'next' in response.keys():
+        if pages > 0 and response['next'] is not None:
             results += self.search_story(query,
                                          pages=pages-1,
                                          next_query=response['next'])
