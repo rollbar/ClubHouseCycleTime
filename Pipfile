@@ -8,6 +8,10 @@ tabulate = "*"
 requests = "*"
 console-progressbar = "*"
 pytz = "*"
+google-api-python-client = "*"
+"oauth2client" = "*"
+gspread = "*"
+argparse = "*"
 
 [dev-packages]
 ipdb = "*"

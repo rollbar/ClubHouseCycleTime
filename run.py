@@ -3,6 +3,7 @@ Load and process data from console
 """
 
 
+import argparse
 import os
 import sys
 
@@ -11,6 +12,11 @@ from console_progressbar import ProgressBar
 from clubhouse import ClubHouseAPI
 from cycle_logic import CycleLogic
 from story import Story
+
+
+SCOPES = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+SHEET_ID = '15RePTcQH63tsBrxl_9oBLUho4QOjaLUXI7TJxAnWVkg'
+GOOGLE_SERVICE_ACCOUNT_FILE = 'CycleTime-c5d6a9b5a35b.json'
 
 
 def help_me():
@@ -45,11 +51,34 @@ def get_clubhouse_apikey_or_exit():
     sys.exit(1)
 
 
+def arg_parser_setup():
+    """ALl the things Google"""
+    parser = argparse.ArgumentParser(
+        description='Calculate cyle time per person per week'
+    )
+    parser.add_argument(
+        '-g',
+        '--googlesheets',
+        help='Send output to Google Sheets if token is present',
+        action='store_true'
+    )
+    args = parser.parse_args()
+    return args
+
+
 def main():
     """Load data, display data"""
+    args = arg_parser_setup()
     clubhouse_apikey = get_clubhouse_apikey_or_exit()
     ch_api = ClubHouseAPI(clubhouse_apikey)
     cycle_logic = CycleLogic()
+
+    if args.googlesheets:
+        cycle_logic.enable_google_sheets_output(
+            sheet_id=SHEET_ID,
+            scopes=SCOPES,
+            service_account_file=GOOGLE_SERVICE_ACCOUNT_FILE
+        )
 
     members = ch_api.get_active_members()
     progress_bar = ProgressBar(total=len(members))

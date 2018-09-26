@@ -7,6 +7,8 @@ import collections
 import datetime
 import math
 
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 from tabulate import tabulate
 
 StoryRow = collections.namedtuple(
@@ -18,6 +20,9 @@ class CycleLogic():
     def __init__(self):
         self._stories = []
         self._members = []
+
+        self.google_sheets_output = False
+        self.members_sheet = None
 
 
     def add_story(self, story):
@@ -39,6 +44,16 @@ class CycleLogic():
         return None
 
 
+    def enable_google_sheets_output(self, sheet_id, scopes, service_account_file):
+        """Enable google sheets output"""
+        self.google_sheets_output = True
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            service_account_file, scopes)
+        gcred = gspread.authorize(credentials)
+        sheets = gcred.open_by_key(sheet_id)
+        self.members_sheet = sheets.worksheet('byMember')
+
+
     def tabulate_result(self, weeks_count=8):
         """Preprare results in a table that can be displayed in console"""
         width, haight = weeks_count+1, len(self.members)
@@ -54,8 +69,10 @@ class CycleLogic():
             week_label = self._week_name(now)
             weeks.insert(0, week_label)
             for j, member in enumerate(self.members):
-                table[j][weeks_count-i] = self._average_cycle_hours(
-                    week=now, member=member)
+                avg_hours = self._average_cycle_hours(week=now, member=member)
+                table[j][weeks_count-i] = avg_hours
+                if i == 0:
+                    self._update_google_sheets(week_label, member, avg_hours)
             now -= datetime.timedelta(weeks=1)
 
         headers += weeks
@@ -118,6 +135,12 @@ class CycleLogic():
             count += 1
             total += story.cycle_time_seconds
         return int(total/count) if count > 0 else 0
+
+
+    def _update_google_sheets(self, week_label, member, avg_hours):
+        cell_week = self.members_sheet.find(week_label)
+        cell_member = self.members_sheet.find(member['profile']['name'])
+        self.members_sheet.update_cell(cell_member.row, cell_week.col, avg_hours)
 
 
     @classmethod
