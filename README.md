@@ -37,6 +37,11 @@ The script will generate a report based on the previous 8 weeks:
  ```
 
 
+## If you are lazy
+
+You can just enjoy the output of this script by [clicking here](https://docs.google.com/spreadsheets/d/15RePTcQH63tsBrxl_9oBLUho4QOjaLUXI7TJxAnWVkg/edit?usp=sharing). No need to run anything.
+
+
  ## How to run it
 
  Firts, you need a ClubHouse API Token. You can generate one from ClubHouse directly under ```Settings->Settings->API Tokens```.
