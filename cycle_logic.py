@@ -76,6 +76,7 @@ class CycleLogic():
             now -= datetime.timedelta(weeks=1)
 
         headers += weeks
+        self._update_google_sheets_time()
         return tabulate(table, tablefmt='presto', headers=headers)
 
 
@@ -137,15 +138,21 @@ class CycleLogic():
         return int(total/count) if count > 0 else 0
 
 
+    def _update_google_sheets_time(self):
+        now = datetime.datetime.now()
+        cell = self.members_sheet.find('Last Update')
+        self.members_sheet.update_cell(cell.row+1, cell.col, now.strftime("%Y-%m-%d %H:%M"))
+
+
     def _update_google_sheets(self, week_label, member, avg_hours):
         try:
             cell_week = self.members_sheet.find(week_label)
             cell_member = self.members_sheet.find(member['profile']['name'])
             self.members_sheet.update_cell(cell_member.row, cell_week.col, avg_hours)
-        except:
-            # Exception here are happening becasue a name is missing in the
-            # spreadsheet. Memebers must be added manually to the spreadsheet
-            # (this is intentional to expose only specific people)
+        except gspread.exceptions.CellNotFound:
+        #     # Exception here are happening becasue a name is missing in the
+        #     # spreadsheet. Memebers must be added manually to the spreadsheet
+        #     # (this is intentional to expose only specific people)
             pass
 
 
