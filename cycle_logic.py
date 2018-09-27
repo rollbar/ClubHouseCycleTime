@@ -150,9 +150,9 @@ class CycleLogic():
             cell_member = self.members_sheet.find(member['profile']['name'])
             self.members_sheet.update_cell(cell_member.row, cell_week.col, avg_hours)
         except gspread.exceptions.CellNotFound:
-        #     # Exception here are happening becasue a name is missing in the
-        #     # spreadsheet. Memebers must be added manually to the spreadsheet
-        #     # (this is intentional to expose only specific people)
+            # Exception here are happening becasue a name is missing in the
+            # spreadsheet. Memebers must be added manually to the spreadsheet
+            # (this is intentional to expose only specific people)
             pass
 
 
