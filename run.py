@@ -62,6 +62,11 @@ def arg_parser_setup():
         help='Send output to Google Sheets if token is present',
         action='store_true'
     )
+    parser.add_argument(
+        '-m',
+        '--debugmember',
+        help='Print stories for particular member'
+    )
     args = parser.parse_args()
     return args
 
@@ -93,7 +98,7 @@ def main():
 
 
     print('\n\n')
-    print(cycle_logic.tabulate_result())
+    print(cycle_logic.tabulate_result(debug_member=args.debugmember))
 
 
 if __name__ == '__main__':

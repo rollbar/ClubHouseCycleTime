@@ -54,7 +54,7 @@ class CycleLogic():
         self.members_sheet = sheets.worksheet('byMember')
 
 
-    def tabulate_result(self, weeks_count=8):
+    def tabulate_result(self, weeks_count=8, debug_member=None):
         """Preprare results in a table that can be displayed in console"""
         width, haight = weeks_count+1, len(self.members)
         table = [[0 for x in range(width)] for y in range(haight)]
@@ -69,7 +69,7 @@ class CycleLogic():
             week_label = self._week_name(now)
             weeks.insert(0, week_label)
             for j, member in enumerate(self.members):
-                avg_hours = self._average_cycle_hours(week=now, member=member)
+                avg_hours = self._average_cycle_hours(now, member, debug_member)
                 table[j][weeks_count-i] = avg_hours
                 if i == 0 and self.google_sheets_output:
                     self._update_google_sheets(week_label, member, avg_hours)
@@ -122,11 +122,11 @@ class CycleLogic():
         return result
 
 
-    def _average_cycle_hours(self, week, member):
-        return  int(math.ceil(self._average_cycle_seconds(week, member)/3600))
+    def _average_cycle_hours(self, week, member, debug_member=None):
+        return  int(math.ceil(self._average_cycle_seconds(week, member, debug_member)/3600))
 
 
-    def _average_cycle_seconds(self, week, member):
+    def _average_cycle_seconds(self, week, member, debug_member=None):
         start_date, end_date = self._week_range(week)
         count = 0
         total = 0
@@ -135,6 +135,13 @@ class CycleLogic():
                                           member=member):
             count += 1
             total += story.cycle_time_seconds
+            if story.owner_id == debug_member and debug_member is not None:
+                if story.completed or story.archived:
+                    color = '\033[92m'
+                else:
+                    color = '\033[91m'
+                print('%s%s\033[0m \t- %s \t- %s \t- %s' %
+                      (color, story.id, story.started_at, story.completed_at, story.name))
         return int(total/count) if count > 0 else 0
 
 
