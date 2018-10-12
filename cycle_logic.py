@@ -71,7 +71,7 @@ class CycleLogic():
             for j, member in enumerate(self.members):
                 avg_hours = self._average_cycle_hours(week=now, member=member)
                 table[j][weeks_count-i] = avg_hours
-                if i == 0:
+                if i == 0 and self.google_sheets_output:
                     self._update_google_sheets(week_label, member, avg_hours)
             now -= datetime.timedelta(weeks=1)
 
@@ -139,9 +139,10 @@ class CycleLogic():
 
 
     def _update_google_sheets_time(self):
-        now = datetime.datetime.now()
-        cell = self.members_sheet.find('Last Update')
-        self.members_sheet.update_cell(cell.row+1, cell.col, now.strftime("%Y-%m-%d %H:%M"))
+        if self.google_sheets_output:
+            now = datetime.datetime.now()
+            cell = self.members_sheet.find('Last Update')
+            self.members_sheet.update_cell(cell.row+1, cell.col, now.strftime("%Y-%m-%d %H:%M"))
 
 
     def _update_google_sheets(self, week_label, member, avg_hours):
